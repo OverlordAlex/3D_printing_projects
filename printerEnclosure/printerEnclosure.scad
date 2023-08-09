@@ -42,7 +42,7 @@ module temp_controller() {
 }
 
 module wire() {
-    diameter = 7;
+    diameter = 8;
     translate([0, 0, diameter])
         rotate([0, 90, 0])
             cylinder(100, diameter, diameter);
@@ -104,29 +104,29 @@ module table(space_below = 0, space_above = 0, base = false) {
     }
     
     // left glass
-    /*translate([corner_brace_width, table_leg_width]) {
+    translate([corner_brace_width, table_leg_width]) {
         rotate([90, 0, 90]) {
             color([0, 0.5, 1, 0.4])
                 cube([table_base_width - table_leg_width - table_leg_width, total_height, plexiglass_thickness]);
             color([1, 0, 1, 1])
                 text(str(table_base_width - table_leg_width - table_leg_width, " x ", total_height), 50);
         }
-    }*/
+    }
     
     // front glass
-    /*translate([table_leg_width, plexiglass_thickness]) {
+    translate([table_leg_width, plexiglass_thickness]) {
         rotate([90, 0, 0]) {
             color([0, 0.5, 1, 0.4])
                 cube([table_base_width - table_leg_width - table_leg_width, total_height, plexiglass_thickness]);
             color([1, 0, 1, 1])
                 text(str(table_base_width - table_leg_width - table_leg_width, " x ", total_height), 50);
         }
-    }*/
+    }
     
     // fans
     translate([table_base_width, table_base_width-table_leg_width - 120]) {
-        rotate([0, 0, 90])
-            fan();
+        /*rotate([0, 0, 90])
+            fan();*/
         translate([0,0,total_height-120])
             rotate([0,0,90])
                 fan();
@@ -441,14 +441,14 @@ module FRT() {
 module BRT() {
     cube([table_leg_width, table_leg_width, bottom_height]);
             
-    //side plywood
+    // back plywood
     translate([0, bottom_height - corner_brace_width, bottom_height])
         rotate([-90, 90, 0])
-            #rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);
+            rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);
 
     translate([0, bottom_height - corner_brace_width - plywood_thickness - corner_brace_width, bottom_height])
         rotate([-90, 90, 0])
-            #rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);
+            rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);
     
     // brace for leg attachment
     plywood_length = table_leg_width - corner_brace_width*2 - plywood_thickness;
@@ -492,6 +492,89 @@ module BRT() {
         rotate([0,90,-180])
             fan_housing();*/
 }
+
+module BRB() {
+    // TODO - enable fan mount
+    plywood_length = table_leg_width - corner_brace_width*2 - plywood_thickness;
+    difference() { // cut space for wire
+        mirror([0, 0, 1]) {
+            cube([table_leg_width, table_leg_width, bottom_height]);
+                    
+            // back plywood
+            translate([0, bottom_height - corner_brace_width, bottom_height])
+                rotate([-90, 90, 0])
+                    rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);
+
+            translate([0, bottom_height - corner_brace_width - plywood_thickness - corner_brace_width, bottom_height])
+                rotate([-90, 90, 0])
+                    rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);
+            
+            // side plywood
+            translate([bottom_height - corner_brace_width, 0, bottom_height])
+                rotate([-90, 0, -90])
+                    rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);
+            translate([bottom_height - corner_brace_width - plywood_thickness - corner_brace_width, 0, bottom_height])
+                rotate([-90, 0, -90])
+                    rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);
+            
+            // top attach tab
+            translate([-table_attach_tab_size-corner_brace_width, plywood_length-table_attach_tab_size, bottom_height])
+                mirror([0,0,1]) tableAttachTab();
+            
+            // brace for leg attachment
+            
+            difference() {
+                translate([-corner_brace_width, -corner_brace_width, -table_attach_tab_size])
+                    cube([corner_brace_width, plywood_length + corner_brace_width, bottom_height + table_attach_tab_size]);
+                
+                translate([0, plywood_length-table_attach_tab_size, -table_attach_tab_size])
+                    rotate([0, -90, 0]) 
+                        tableAttachTab(true);
+                    
+            }
+            
+            // top attach tab
+            translate([plywood_length - table_attach_tab_size, -table_attach_tab_size-corner_brace_width, bottom_height])
+                mirror([0,0,1]) tableAttachTab();
+            translate([0, -corner_brace_width, -table_attach_tab_size])
+                cube([plywood_length, corner_brace_width, bottom_height+table_attach_tab_size]);
+            
+            
+            // TODO print separately, including fan!
+            // brace for fan
+            /*size_to_fan_brace = table_leg_width - 25;
+            difference() { // remove what will be the table brace
+                translate([0, -corner_brace_width, -table_attach_tab_size]) 
+                    cube([size_to_fan_brace, corner_brace_width, bottom_height + table_attach_tab_size]);
+                
+                // cutout for tab
+                translate([table_attach_tab_size/2, -corner_brace_width, bottom_height-corner_brace_width-0.1])
+                    cube([table_attach_tab_size, corner_brace_width, corner_brace_width+0.1]); // lil bit of tolerance
+            }
+            translate([size_to_fan_brace, 0, -table_attach_tab_size]) 
+                rotate([-90, 0, 180])
+                    rightAngleTriangle(size_to_fan_brace, size_to_fan_brace, corner_brace_width);
+            translate([table_leg_width - 25, -corner_brace_width, -(120-bottom_height)])
+                cube([25, corner_brace_width, 120]);
+            
+            // the fan itself
+            translate([table_leg_width - corner_brace_width, 0, bottom_height])
+                rotate([0,90,-180])
+                    fan_housing();*/
+        }
+        
+        wire_diameter = 8;
+        translate([-10, corner_brace_width+wire_diameter, -bottom_height]) 
+            #wire();
+        
+        translate([-corner_brace_width, plywood_length - table_attach_tab_size - wire_diameter*2, -bottom_height]) 
+            #cube([table_leg_width + corner_brace_width, wire_diameter*2, wire_diameter]);
+        
+    }
+    
+}
+
+
 
 module fan_housing() {
     width = 120;
@@ -692,7 +775,7 @@ module temp_modulator() {
     
 }
 
-//table(space_below = bottom_height, space_above = top_height, base = false );
+table(space_below = bottom_height, space_above = top_height, base = false );
 
 translate([0, table_base_width - table_leg_width, 400 + 50])
     BLT(); // printed!
@@ -717,10 +800,9 @@ translate([table_base_width - table_leg_width, 0, 400 + 50])
 translate([table_base_width - table_leg_width, table_base_width - table_leg_width, 400 + 50])
     BRT();
 
+translate([table_base_width - table_leg_width, table_base_width - table_leg_width, 50])
+    BRB();
 
-// TODO design
-////  BackRightBottom
-////  
 
 // TODO test prints
 //// cable routers - can the cable go in, and is it held in place
