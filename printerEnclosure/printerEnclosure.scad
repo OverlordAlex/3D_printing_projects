@@ -438,7 +438,99 @@ module FRT() {
         
 } 
 
+module BRT() {
+    cube([table_leg_width, table_leg_width, bottom_height]);
+            
+    //side plywood
+    translate([0, bottom_height - corner_brace_width, bottom_height])
+        rotate([-90, 90, 0])
+            #rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);
 
+    translate([0, bottom_height - corner_brace_width - plywood_thickness - corner_brace_width, bottom_height])
+        rotate([-90, 90, 0])
+            #rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);
+    
+    // brace for leg attachment
+    plywood_length = table_leg_width - corner_brace_width*2 - plywood_thickness;
+    difference() {
+        translate([-corner_brace_width, -corner_brace_width, -table_attach_tab_size])
+            cube([corner_brace_width, plywood_length + corner_brace_width, bottom_height + table_attach_tab_size]);
+        
+        translate([0, plywood_length-table_attach_tab_size, -table_attach_tab_size])
+            rotate([0, -90, 0]) 
+                tableAttachTab(true);
+            
+    }
+    
+    // top attach tabs
+    translate([table_attach_tab_size/2, -table_attach_tab_size, bottom_height])
+        mirror([0,0,1]) tableAttachTab();
+    
+    
+    translate([-table_attach_tab_size-corner_brace_width, plywood_length-table_attach_tab_size, bottom_height])
+    mirror([0,0,1]) tableAttachTab();
+    
+    // TODO print separately, including fan!
+    // brace for fan
+    /*size_to_fan_brace = table_leg_width - 25;
+    difference() { // remove what will be the table brace
+        translate([0, -corner_brace_width, -table_attach_tab_size]) 
+            cube([size_to_fan_brace, corner_brace_width, bottom_height + table_attach_tab_size]);
+        
+        // cutout for tab
+        translate([table_attach_tab_size/2, -corner_brace_width, bottom_height-corner_brace_width-0.1])
+            cube([table_attach_tab_size, corner_brace_width, corner_brace_width+0.1]); // lil bit of tolerance
+    }
+    translate([size_to_fan_brace, 0, -table_attach_tab_size]) 
+        rotate([-90, 0, 180])
+            rightAngleTriangle(size_to_fan_brace, size_to_fan_brace, corner_brace_width);
+    translate([table_leg_width - 25, -corner_brace_width, -(120-bottom_height)])
+        cube([25, corner_brace_width, 120]);
+    
+    // the fan itself
+    translate([table_leg_width - corner_brace_width, 0, bottom_height])
+        rotate([0,90,-180])
+            fan_housing();*/
+}
+
+module fan_housing() {
+    width = 120;
+    thickness = 25;
+    ID = 16;
+    fan_extrakerf = 4;
+    thickness_tolerance = 0.1;
+    existing = (thickness - ID) / 2 + thickness_tolerance;
+    
+    translate([0, 0, -existing]) {
+        intersection() {
+            difference() {
+                cube([width, width, thickness]);
+                
+                translate([width/2, width/2])
+                    cylinder(h = thickness, d = width + fan_extrakerf);
+                
+                // cut the top and bottom plastics
+                cube([width, width, existing]);
+                translate([0, 0, existing + ID - thickness_tolerance])
+                    cube([width, width, existing]);
+                
+                // cut a fan holder slot
+                distance = sqrt(60 * 60) - 40;
+                translate([distance - sqrt(50), distance - sqrt(50), thickness/2])
+                    rotate([0,0,45])
+                        cube([10, 2.5, thickness], center=true);
+                
+                translate([width-(distance - sqrt(50)), distance - sqrt(50), thickness/2])
+                    rotate([0,0,-45])
+                        cube([10, 2.5, thickness], center=true);
+            }
+            
+            // TODO /2 both for a single segment
+            cube([width, width/2, thickness]);
+        }
+    }
+    
+}
 
 module wireclip(r=3.75, thickness=2) {
     difference() {
@@ -509,7 +601,6 @@ module top_wire_route(depth, thickness) {
 module back_wire_route(length, thickness) {
     wire_width = 1.8;
     total_width = wire_width * 1.5 * 4 + wire_width/2;
-    echo(total_width);
     
     translate([-thickness/2, wire_width, wire_width/2])
         rotate([0, -90, 0]) {
@@ -601,7 +692,7 @@ module temp_modulator() {
     
 }
 
-table(space_below = bottom_height, space_above = top_height, base = false );
+//table(space_below = bottom_height, space_above = top_height, base = false );
 
 translate([0, table_base_width - table_leg_width, 400 + 50])
     BLT(); // printed!
@@ -623,11 +714,17 @@ translate([table_base_width - table_leg_width, 0, 400 + 50])
     FRT();
 
 
+translate([table_base_width - table_leg_width, table_base_width - table_leg_width, 400 + 50])
+    BRT();
+
 
 // TODO design
-////// fan mounts
 ////  BackRightBottom
-////  BackRightTop
+////  
+
+// TODO test prints
+//// cable routers - can the cable go in, and is it held in place
+//// fan mount - should be a tight tolerance fit
 
 // TODO prints
 ////  FrontRightBottom
@@ -638,6 +735,8 @@ translate([table_base_width - table_leg_width, 0, 400 + 50])
 ////  Hinge * 2
 ////  cable management - use the 4 wire back temp module to print cable management
 ////                     can be used to test teh bigger module!
+////  BackRightTop
+////      fan mount
 
 
 
