@@ -10,7 +10,7 @@ module screw(length = 24) {
     // 16, 20, 24, 45   x 3.8
     cylinder(length, d=2.8, center=true);
     translate([0, 0, length/2])
-        cylinder(4.5, 2.8/2, 7.85/2);
+        cylinder(4.5, 2.8/2, 9/2);
 }
 
 module tableLeg() {
@@ -58,7 +58,7 @@ module table(space_below = 0, space_above = 0, base = false) {
     total_height = space_below + space_above + 400;
     
     // legs and top
-    color([0, 0, 1, 0.4]) {
+    /*color([0, 0, 1, 0.4]) {
         translate([0, 0, space_below]) {
             tableLeg();
             label("FL");
@@ -81,10 +81,10 @@ module table(space_below = 0, space_above = 0, base = false) {
         
         translate([0, 0, total_height])
             tableBase();
-    }
+    }*/
     
     // back plywood
-    translate([table_leg_width, table_base_width - corner_brace_width]) {
+    /*translate([table_leg_width, table_base_width - corner_brace_width]) {
         rotate([90, 0, 0]) {
             color([0, 1, 0, 1])
                 cube([table_base_width - table_leg_width - table_leg_width, total_height, plywood_thickness]);
@@ -111,7 +111,7 @@ module table(space_below = 0, space_above = 0, base = false) {
             color([1, 0, 1, 1])
                 text(str(table_base_width - table_leg_width - table_leg_width, " x ", total_height), 50);
         }
-    }
+    }*/
     
     // front glass
     translate([table_leg_width, plexiglass_thickness]) {
@@ -282,7 +282,16 @@ module FLT() {
 
 
 module FRB() {
-    cube([table_leg_width, table_leg_width, bottom_height]);
+    difference() {
+        cube([table_leg_width, table_leg_width, bottom_height]);
+        
+        /*translate([8, 4, bottom_height/2]) {
+            rotate([90, 0, 00]) {
+                hinge_leaf(0);
+            }
+        }*/
+        cube([table_leg_width, plexiglass_thickness+3, bottom_height]);
+    }
     
     //side plywood
     translate([table_leg_width, table_leg_width])
@@ -294,32 +303,32 @@ module FRB() {
     
     // hinge
     difference() {
-        translate([0, -6])
-            cube([table_leg_width, 6, bottom_height]);
+        translate([0, -3])
+            cube([table_leg_width, 14, bottom_height]);
         
         // cutout where the hinge will be
-        translate([0, -6, bottom_height/2]) {
+        #translate([10, -3-0.1, bottom_height/2]) {
             rotate([90, 0, 00]) {
                 //main();
                 hinge_leaf(0);
-                //hinge_leaf(1);
+                hinge_leaf(1);
             }
         }
         
         // cleanup leftoever material
-        translate([0, -6, 4])
-            cube([table_leg_width/2, 6, bottom_height-8]);
+        #translate([0, -3, 2-0.1])
+            cube([table_leg_width/2, 10+0.1, bottom_height-4+0.2]);
     }
     // hinge extra triangle to leg
     translate([table_leg_width, 0, bottom_height])
         mirror([0,1,0])
             rotate([0, -90, 0])
-                rightAngleTriangle(6, 6, table_leg_width);
+                rightAngleTriangle(3, 6, table_leg_width);
     
     // plexiglass stop
-    translate([0, plexiglass_thickness + corner_brace_width])
+    /*translate([0, plexiglass_thickness + corner_brace_width])
         rotate([0, -90, 90])
-            rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);  
+            rightAngleTriangle(bottom_height, bottom_height, corner_brace_width);  */
   
     ply_holder_width = plywood_thickness + corner_brace_width*2;
     ply_side = table_leg_width - ply_holder_width;
@@ -329,19 +338,19 @@ module FRB() {
         difference() {
             cube([ply_side + corner_brace_width, corner_brace_width, bottom_height + table_attach_tab_size]);  
         
-            translate([0, 0, bottom_height + table_attach_tab_size])
+            translate([table_attach_tab_size, 0, bottom_height + table_attach_tab_size])
                 rotate([-90, 0, 0]) {
                         tableAttachTab(true);
                 }
         }
     }
-    translate([0, plexiglass_thickness])
+   /*translate([0, plexiglass_thickness])
         cube([corner_brace_width, table_leg_width - plexiglass_thickness, bottom_height + table_attach_tab_size]);
-    
+    */
     // tabs to attach to bottom
-    translate([-table_attach_tab_size, plexiglass_thickness + corner_brace_width])
+    translate([-table_attach_tab_size, plexiglass_thickness + 20])
         tableAttachTab();
-    translate([ply_side - table_attach_tab_size, table_leg_width + corner_brace_width])
+    translate([ply_side - table_attach_tab_size*1.5, table_leg_width + corner_brace_width])
         tableAttachTab();
 }
 
@@ -421,17 +430,17 @@ module FRT() {
 
             translate([-box_width, table_leg_width + corner_brace_width - (17.5 + corner_brace_width), -table_attach_tab_size]) 
                 // TODO print me separate! - warning - make sure hangers are included!!
-                temp_modulator();
+                #temp_modulator();
         }
         
-        box_width = 68.5 + 2*corner_brace_width;
+        box_width = temp_modulator_box_width + 2*corner_brace_width;
         depth = 17.5/3 + corner_brace_width + 0.1;
         // cut out hangers for the box
         translate([-box_width, table_leg_width - depth/2 + corner_brace_width, -table_attach_tab_size]) {
-            translate([68.5+corner_brace_width+0.1, 0, 42.3/4 + 6])
+            translate([temp_modulator_box_width+corner_brace_width+0.1, 0, temp_modulator_box_height/4 + 6])
                 hanger(0.5);
             
-            translate([68.5+corner_brace_width+0.1, 0, 42.3*3/4 + 6])
+            translate([temp_modulator_box_width+corner_brace_width+0.1, 0, temp_modulator_box_height*3/4 + 6])
                 hanger(0.5);
         }
     }
@@ -472,25 +481,27 @@ module BRT() {
     
     // TODO print separately, including fan!
     // brace for fan
-    /*size_to_fan_brace = table_leg_width - 25;
-    difference() { // remove what will be the table brace
-        translate([0, -corner_brace_width, -table_attach_tab_size]) 
-            cube([size_to_fan_brace, corner_brace_width, bottom_height + table_attach_tab_size]);
+    /*union() {
+        size_to_fan_brace = table_leg_width - 25;
+        difference() { // remove what will be the table brace
+            translate([0, -corner_brace_width, -table_attach_tab_size]) 
+                cube([size_to_fan_brace, corner_brace_width, bottom_height + table_attach_tab_size]);
+            
+            // cutout for tab
+            translate([table_attach_tab_size/2, -corner_brace_width, bottom_height-corner_brace_width-0.1])
+                cube([table_attach_tab_size, corner_brace_width, corner_brace_width+0.1]); // lil bit of tolerance
+        }
+        translate([size_to_fan_brace, 0, -table_attach_tab_size]) 
+            rotate([-90, 0, 180])
+                rightAngleTriangle(size_to_fan_brace, size_to_fan_brace, corner_brace_width);
+        translate([table_leg_width - 25, -corner_brace_width, -(120-bottom_height)])
+            cube([25, corner_brace_width, 120]);
         
-        // cutout for tab
-        translate([table_attach_tab_size/2, -corner_brace_width, bottom_height-corner_brace_width-0.1])
-            cube([table_attach_tab_size, corner_brace_width, corner_brace_width+0.1]); // lil bit of tolerance
-    }
-    translate([size_to_fan_brace, 0, -table_attach_tab_size]) 
-        rotate([-90, 0, 180])
-            rightAngleTriangle(size_to_fan_brace, size_to_fan_brace, corner_brace_width);
-    translate([table_leg_width - 25, -corner_brace_width, -(120-bottom_height)])
-        cube([25, corner_brace_width, 120]);
-    
-    // the fan itself
-    translate([table_leg_width - corner_brace_width, 0, bottom_height])
-        rotate([0,90,-180])
-            fan_housing();*/
+        // the fan itself
+        translate([table_leg_width - corner_brace_width, 0, bottom_height])
+            rotate([0,90,-180])
+                fan_housing();
+    }*/
 }
 
 module BRB() {
@@ -615,7 +626,7 @@ module fan_housing() {
     
 }
 
-module wireclip(r=3.75, thickness=2) {
+module wireclip(r=3.25, thickness=2) {
     difference() {
             union() {
                 difference() {
@@ -637,11 +648,11 @@ module top_wire_route(depth, thickness) {
     wire_width = 3.75;
     
     difference() {
-        cube([68.5 + 2*thickness, depth, thickness]);
+        cube([temp_modulator_box_width + 2*thickness, depth, thickness]);
         
         // registration edge
         translate([0, depth - thickness - 0.01])
-            cube([68.5 + 2*thickness - 8, thickness + 0.01, thickness]);
+            cube([temp_modulator_box_width + 2*thickness - 8, thickness + 0.01, thickness]);
     }
 
     // from device
@@ -659,7 +670,7 @@ module top_wire_route(depth, thickness) {
                         wireclip();
     
     // to end
-    rest= 68.5 - (2*thickness + 6.5 + wire_width + thickness*2);
+    rest= temp_modulator_box_width - (2*thickness + 6.5 + wire_width + thickness*2);
     translate([rest + 6.5 + wire_width + thickness*2, depth/3 + thickness *2, thickness])
         rotate([0, -90, 0])
             linear_extrude(rest)
@@ -682,10 +693,30 @@ module top_wire_route(depth, thickness) {
 }
 
 module back_wire_route(length, thickness) {
-    wire_width = 1.8;
-    total_width = wire_width * 1.5 * 4 + wire_width/2;
+    wire_width = 3;
+    wires=4;
+    wire_holder_gap = wire_width*2/3;
     
-    translate([-thickness/2, wire_width, wire_width/2])
+    total_width = (wire_width/2 + wire_holder_gap) * wires;
+    
+    for (i = [0:wires-1]) {
+        // wire supports are half the length of the wire
+        // hangers are longer, and slightly closer together to squeeze wire
+        translate([i * (wire_width/2 + wire_holder_gap), 0]) {
+            rhombus(wire_width/2, wire_width*1.5, length);
+        }
+    }
+    
+    translate([0, -thickness])
+    cube([total_width, thickness, length]);
+    
+    
+
+    /*translate([0, depth/2, depth/2])
+        rotate([0,-90,180])
+            rightAngleTriangle(depth/2, depth/2, table_leg_width/2);*/
+    
+    /*translate([-thickness/2, wire_width, wire_width/2])
         rotate([0, -90, 0]) {
             linear_extrude(length) {
                 wires=4;
@@ -695,16 +726,16 @@ module back_wire_route(length, thickness) {
                     }
                 }
             }
-        }
+        }*/
 
-    translate([-thickness/2, total_width])
+    /*translate([-thickness/2, total_width])
         mirror([1,0,0])
             rotate([0, -90, 90])
                 rightAngleTriangle(thickness/2, thickness/2, total_width);
     
     translate([-length - thickness/2, total_width ])
         rotate([0, -90, 90])
-            rightAngleTriangle(thickness/2, thickness/2, total_width);
+            rightAngleTriangle(thickness/2, thickness/2, total_width);*/
 
     
 }
@@ -722,62 +753,73 @@ module hanger(tolerance = 0) {
         rightAngleTriangle(depth/2, depth/2, table_leg_width/2);
 }
 
+// 69   x 42.7 too large by a tiiiny bit in both dimensions
+// 68.8 x 42.6 still too large!
+temp_modulator_box_width = 68.4;
+temp_modulator_box_height = 42.1;
 module temp_modulator() {
     
     tolerance = 0.1;
     thickness = corner_brace_width;
     depth = 17.5 + thickness;
     
-    difference() {
-        cube([68.5 + 2*thickness, depth, 42.3 + 2*thickness]);
-        
-        // main board
-        translate([thickness, 0, thickness])
-            cube([68.5+tolerance, 17.5+tolerance, 42.3+tolerance]);
-        
-        // wire cutout
-        translate([0, 0, 11 + thickness]) {
-            cube([thickness, 15.5+tolerance, 20]);
-        
-            translate([thickness, 15.5+tolerance+thickness, 0])
-                linear_extrude(20)
-                    rotate([0,0,180])
-                        difference() {
-                            translate([0,-thickness])
-                                square([thickness, thickness*2]);
-                            circle(thickness-0.00001); // weird scad bug?
-                        }
+    union() {
+        difference() {
+            cube([temp_modulator_box_width + 2*thickness, depth, temp_modulator_box_height + 2*thickness]);
+            
+            // main board
+            translate([thickness, 0, thickness])
+                cube([temp_modulator_box_width+tolerance, 17.5+tolerance, temp_modulator_box_height+tolerance]);
+            
+            // wire cutout
+            translate([0, 0, 11 + thickness]) {
+                cube([thickness, 15.5+tolerance, 20]);
+            
+                translate([thickness, 15.5+tolerance+thickness, 0])
+                    linear_extrude(20)
+                        rotate([0,0,180])
+                            difference() {
+                                translate([0,-thickness])
+                                    square([thickness, thickness*2]);
+                                circle(thickness-0.00001); // weird scad bug?
+                            }
+            }
+            
+            //translate([0, 5])
+            //cube([temp_modulator_box_width + 2*thickness, depth-5, temp_modulator_box_height + 2*thickness]);
         }
+        
+        // hangers
+        translate([temp_modulator_box_width+thickness+tolerance, depth - (17.5/3 + corner_brace_width)/2, temp_modulator_box_height/4 + 6])
+            hanger(-0.5);
+        
+        translate([temp_modulator_box_width+thickness+tolerance, depth - (17.5/3 + corner_brace_width)/2, temp_modulator_box_height*3/4 + 6])
+            hanger(-0.5);
     }
     
-    // hangers
-    translate([68.5+thickness+tolerance, depth - (17.5/3 + corner_brace_width)/2, 42.3/4 + 6])
-        hanger();
     
-    translate([68.5+thickness+tolerance, depth - (17.5/3 + corner_brace_width)/2, 42.3*3/4 + 6])
-        hanger();
-    
-    
-    translate([0,0,42.3 + 2*thickness]) {
+    /*translate([0, 0, 42.4 + 2*thickness]) {
         // TODO print separate!
         top_wire_route(depth, thickness);
         
         // registration edge 
         translate([0, depth - thickness])
-            cube([68.5 + 2*thickness - 8.1, thickness, thickness]);
+            cube([temp_modulator_box_width + 2*thickness - 8.1, thickness, thickness]);
     }
     
     // TODO print separate
     // wire thickness is complicated, magic number since it doesnt matter
-    translate([68.5 + 2*thickness, depth, (42.3 + 2*thickness + 11.7)/2])
+    translate([temp_modulator_box_width + 2*thickness, depth, (temp_modulator_box_height + 2*thickness + 21.4)/2])
         rotate([-90, 0, 0])
-            back_wire_route(68.5, thickness);
+            back_wire_route(temp_modulator_box_width, thickness);*/
     
 }
 
-table(space_below = bottom_height, space_above = top_height, base = false );
 
-translate([0, table_base_width - table_leg_width, 400 + 50])
+
+//table(space_below = bottom_height, space_above = top_height, base = false );
+
+/*translate([0, table_base_width - table_leg_width, 400 + 50])
     BLT(); // printed!
 
 translate([0, table_base_width - table_leg_width])
@@ -787,22 +829,24 @@ translate([0, table_base_width - table_leg_width])
 FLB(); // printed!
 
 translate([0, 0, 400 + 50])
-    FLT(); // in progress printing
-
+    FLT(); // printed!*/
 
 translate([table_base_width - table_leg_width, 0])
-    FRB();
+    FRB(); // printed!
 
-translate([table_base_width - table_leg_width, 0, 400 + 50])
-    FRT();
+/*translate([table_base_width - table_leg_width, 0, 400 + 50])
+    FRT(); // printed!
 
 
 translate([table_base_width - table_leg_width, table_base_width - table_leg_width, 400 + 50])
-    BRT();
+    BRT(); // printed!
 
 translate([table_base_width - table_leg_width, table_base_width - table_leg_width, 50])
-    BRB();
+    BRB(); // printed!*/
+ 
 
+// TODO design
+//// door handle + magnet
 
 // TODO test prints
 //// cable routers - can the cable go in, and is it held in place
@@ -820,15 +864,29 @@ translate([table_base_width - table_leg_width, table_base_width - table_leg_widt
 ////  BackRightTop
 ////      fan mount
 
+//temp_modulator();
+//wireclip();
+/*#wireclip(3.5, corner_brace_width);*/
+//back_wire_route(5, corner_brace_width);
+//hanger();
+//back_wire_route(5, corner_brace_width);
 
+//main();
 
-
-
-
-
-
-
-
+// hinge
+/*translate([6, 0, bottom_height/2])
+    rotate([90, 0, 90])
+        main();
+        
+translate([-10, 16, 0]) {
+    
+    for (i=[0:90:90]) {
+        rotate([0,0,-i])
+            cube([10, 120, 60]);
+    }
+    
+}
+*/
 
 
 

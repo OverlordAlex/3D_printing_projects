@@ -191,7 +191,7 @@ component_color              = "Silver";
 hinge_width                           = (50-4)*2;
 hinge_leaf_height                           = 46.0;
 // hinge_leaf and knuckle thickness. Values greater than 3mm recommended.
-hinge_leaf_gauge                            = 6.0;
+hinge_leaf_gauge                            = 6.0+4;
 // Recomended values between 0.3 and 4.0. Better quality below 3.0, tough to loosen.
 component_clearance                   = 0.4;
 // Knuckle count must be an odd number, so that the pin is supported on both ends.
@@ -344,7 +344,11 @@ module main ()
     
     rotate ( [ 0.0, 0.0, ( m_flip_model ) ? 180.0 : 0.0 ] )
     {
-        if ( m_female_hinge_leaf_enabled ) rotate ( [ 0.0, -m_throw_angle, 0.0 ] ) hinge_leaf ( C_FEMALE );
+        if ( m_female_hinge_leaf_enabled ) {
+            m_hinge_leaf_width = m_hinge_leaf_width/4;
+                rotate ( [ 0.0, -m_throw_angle, 0.0 ] ) 
+                    hinge_leaf ( C_FEMALE );
+            }
         if ( m_male_hinge_leaf_enabled )   hinge_leaf ( C_MALE );     
     }
 }
@@ -555,7 +559,7 @@ module workpiece_hinge_leaf_knuckle ( gender )
     
     gender_flipped = ( gender == C_MALE ) ? C_FEMALE : C_MALE;
     
-    w = m_hinge_leaf_width;
+    w = ( gender == C_MALE ) ? m_hinge_leaf_width : (m_hinge_leaf_width / 1.3);
     l = m_hinge_leaf_height;
     h = m_hinge_leaf_gauge;
     r = m_hinge_leaf_fillet_radius;

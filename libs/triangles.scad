@@ -34,9 +34,31 @@ module equilateralTriangle(sideLength, height=0) {
     }
 }
 
+module diamond(sideLength, height=0) {
+    rhombus(sideLength, sideLength, height);
+}
 
+module rhombus(longside, shortside, height=0) {
+    rhomboid(longside, shortside, 60, height);
+}
 
+module rhomboid(longside, shortside, angle, height=0, center=false) {
+    centerx = center ? -(longside + shortside*cos(angle))/2 : 0;
+    centery = center ? -(shortside * sin(angle))/2 : 0;
+    echo(centerx);
+    echo(centery);
+    
+    points = [[0, 0], [longside, 0], [longside + shortside*cos(angle), shortside*sin(angle)], [shortside*cos(angle), shortside*sin(angle)]];
 
+    translate([centerx, centery]) {
+        if (height > 0) {
+            linear_extrude(height)
+                polygon(points);
+        } else {
+            polygon(points);
+        }
+    }
+}
 
 
 
